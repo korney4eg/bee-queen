@@ -31,7 +31,12 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v .
+      run: go build -v . -o bee-queen
 
     - name: Test
       run: go test -v .
+    - uses: actions/upload-artifact@master
+      with:
+        name: bee-queen
+        path: ./
+
