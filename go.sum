@@ -1,0 +1,17 @@
+github.com/Syfaro/telegram-bot-api v1.0.0 h1:iA3Fuy9iJF0D9+SR9kY98Tj7od8N253UiscGOmGiHB4=
+github.com/Syfaro/telegram-bot-api v4.6.4+incompatible h1:O30CgxZ/BuHpWfONoGirTIU7XUWhz6NPelk80FxipDI=
+github.com/Syfaro/telegram-bot-api v4.6.4+incompatible/go.mod h1:eC/lEGT3gOB9RowMYsLx0YH1U8a/dEjceHY3M//ej88=
+github.com/go-telegram-bot-api/telegram-bot-api v1.0.0 h1:HXVtsZ+yINQeyyhPFAUU4yKmeN+iFhJ87jXZOC016gs=
+github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible h1:2cauKuaELYAEARXRkq2LrJ0yDDv1rW7+wrTEdVL3uaU=
+github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible/go.mod h1:qf9acutJ8cwBUhm1bqgz6Bei9/C/c93FPDljKWwsOgM=
+github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1 h1:Mr8jIV7wDfLw5Fw6BPupm0aduTFdLjhI3wFuIIZKvO4=
+github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.0-rc1/go.mod h1:2s/IzRcxCszyNh760IjJiqoYHTnifk8ZeNYL33z8Pww=
+github.com/jessevdk/go-flags v1.4.0 h1:4IU2WS7AumrZ/40jfhf4QVDMsQwqA7VEHozFRrGARJA=
+github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
+github.com/kyokomi/emoji v1.5.1 h1:qp9dub1mW7C4MlvoRENH6EAENb9skEFOvIEbp1Waj38=
+github.com/kyokomi/emoji v2.2.2+incompatible h1:gaQFbK2+uSxOR4iGZprJAbpmtqTrHhSdgOyIMD6Oidc=
+github.com/kyokomi/emoji v2.2.2+incompatible/go.mod h1:mZ6aGCD7yk8j6QY6KICwnZ2pxoszVseX1DNoGtU2tBA=
+github.com/mileusna/useragent v0.0.0-20200130135054-eb80d80699e8 h1:9llJ2FwJA1bnf2d/VWxClO6Zn3groOgUiHiPPtS1zI4=
+github.com/mileusna/useragent v0.0.0-20200130135054-eb80d80699e8/go.mod h1:JWhYAp2EXqUtsxTKdeGlY8Wp44M7VxThC9FEoNGi2IE=
+github.com/technoweenie/multipartstreamer v1.0.1 h1:XRztA5MXiR1TIRHxH2uNxXxaIkKQDeX7m2XsSOlQEnM=
+github.com/technoweenie/multipartstreamer v1.0.1/go.mod h1:jNVxdtShOxzAsukZwTSw6MDx5eUJoiEBsSvzDU9uzog=
