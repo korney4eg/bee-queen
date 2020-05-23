@@ -15,8 +15,10 @@ import (
 )
 
 type opts struct {
-	Period   string `short:"p" long:"period" required:"true" choice:"any" choice:"day" choice:"month"`
-	FileName string `short:"f" long:"file" required:"false"`
+	Period         string `short:"p" long:"period" required:"true" choice:"any" choice:"day" choice:"week" choice:"month"`
+	FileName       string `short:"f" long:"file" required:"false"`
+	TelegramToken  string `short:"t" long:"telegram-token" required:"false"`
+	TelegramChatId string `short:"c" long:"telegram-chat-id" required:"false"`
 }
 
 func main() {
@@ -58,14 +60,14 @@ func main() {
 	// 	source.Close()
 	// }
 	msg := fmt.Sprintf("*Users*: %d |||  *Hits*: %d\n*Popular pages*: %+v\n", collection.Users, collection.Hits, collection.GetViewsByPage())
-	if os.Getenv("BOT_TOKEN") != "" && os.Getenv("CHAT_ID") != "" {
-		bot, err := tgbotapi.NewBotAPI(os.Getenv("BOT_TOKEN"))
+	if o.TelegramToken != "" && o.TelegramChatId != "" {
+		bot, err := tgbotapi.NewBotAPI(o.TelegramToken)
 		if err != nil {
 			log.Panic(err)
 		}
 
 		log.Printf("Authorized on account %s", bot.Self.UserName)
-		n, err := strconv.ParseInt(os.Getenv("CHAT_ID"), 10, 64)
+		n, err := strconv.ParseInt(o.TelegramChatId, 10, 64)
 		if err == nil {
 			fmt.Printf("%d of type %T", n, n)
 		}
