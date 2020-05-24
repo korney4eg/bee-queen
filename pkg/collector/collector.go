@@ -14,6 +14,7 @@ import (
 type Collector struct {
 	Hits           int
 	Users          int
+	Domain         string
 	usersList      []string
 	PageViews      map[string]int
 	ViewsByBrowser map[string]int

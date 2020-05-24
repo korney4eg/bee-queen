@@ -19,6 +19,7 @@ type opts struct {
 	FileName       string `short:"f" long:"file" required:"false"`
 	TelegramToken  string `short:"t" long:"telegram-token" required:"false"`
 	TelegramChatId string `short:"c" long:"telegram-chat-id" required:"false"`
+	DomainName     string `short:"d" long:"domain" required:"true"`
 }
 
 func main() {
@@ -42,7 +43,7 @@ func main() {
 	}
 	scanner := bufio.NewScanner(source)
 	scanner.Split(bufio.ScanLines)
-	collection := &collector.Collector{}
+	collection := &collector.Collector{Domain: o.DomainName}
 
 	for scanner.Scan() {
 		var sll logline.SingleLogLine
@@ -59,7 +60,7 @@ func main() {
 	// if o.FileName != "" {
 	// 	source.Close()
 	// }
-	msg := fmt.Sprintf("*Users*: %d |||  *Hits*: %d\n*Popular pages*:\n%+v\n*Popular tags*:\n%+v", collection.Users, collection.Hits, collection.GetViews(collection.PageViews), collection.GetViews(collection.TagViews))
+	msg := fmt.Sprintf("*%s*\n_Users: %d |  Hits: %d_\n*Popular pages*:\n%+v\n*Popular tags*:\n%+v", collection.Domain, collection.Users, collection.Hits, collection.GetViews(collection.PageViews), collection.GetViews(collection.TagViews))
 	if o.TelegramToken != "" && o.TelegramChatId != "" {
 		bot, err := tgbotapi.NewBotAPI(o.TelegramToken)
 		if err != nil {
