@@ -49,7 +49,7 @@ func main() {
 		if err := sll.New(scanner.Text()); err != nil {
 			log.Fatalf("failed opening file: %s", err)
 		}
-		if !sll.MatchAllRequirements("any") {
+		if !sll.MatchAllRequirements(o.Period) {
 			continue
 		}
 		if err := collection.Accumulate(&sll); err != nil {
@@ -59,7 +59,7 @@ func main() {
 	// if o.FileName != "" {
 	// 	source.Close()
 	// }
-	msg := fmt.Sprintf("*Users*: %d |||  *Hits*: %d\n*Popular pages*: %+v\n", collection.Users, collection.Hits, collection.GetViewsByPage())
+	msg := fmt.Sprintf("*Users*: %d |||  *Hits*: %d\n*Popular pages*:\n%+v\n*Popular tags*:\n%+v", collection.Users, collection.Hits, collection.GetViews(collection.PageViews), collection.GetViews(collection.TagViews))
 	if o.TelegramToken != "" && o.TelegramChatId != "" {
 		bot, err := tgbotapi.NewBotAPI(o.TelegramToken)
 		if err != nil {

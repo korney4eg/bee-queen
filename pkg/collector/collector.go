@@ -15,9 +15,11 @@ type Collector struct {
 	Hits           int
 	Users          int
 	usersList      []string
-	ViewsByPage    map[string]int
+	PageViews      map[string]int
 	ViewsByBrowser map[string]int
 	ViewsByOS      map[string]int
+	TagViews       map[string]int
+	ArchiveViews   map[string]int
 }
 
 type PageViews struct {
@@ -40,14 +42,27 @@ func (col *Collector) Accumulate(line *logline.SingleLogLine) error {
 		col.Users++
 	}
 	page := strings.Split(line.Request, " ")[1]
-	if col.ViewsByPage == nil {
-		col.ViewsByPage = make(map[string]int)
+	if col.PageViews == nil {
+		col.PageViews = make(map[string]int)
+	}
+	if col.TagViews == nil {
+		col.TagViews = make(map[string]int)
+	}
+	if col.ArchiveViews == nil {
+		col.ArchiveViews = make(map[string]int)
 	}
 	decodedPage, err := url.QueryUnescape(page)
 	if err != nil {
 		return err
 	}
-	col.ViewsByPage[decodedPage] += 1
+	if strings.HasPrefix(decodedPage, "/tags/") {
+		col.TagViews[decodedPage] += 1
+	} else if strings.HasPrefix(decodedPage, "/archives/") {
+		col.ArchiveViews[decodedPage] += 1
+	} else {
+		col.PageViews[decodedPage] += 1
+
+	}
 
 	ua := ua.Parse(line.HTTPUserAgent)
 
@@ -62,10 +77,10 @@ func (col *Collector) Accumulate(line *logline.SingleLogLine) error {
 	return nil
 }
 
-func (col *Collector) GetViewsByPage() (views string) {
-	p := make(PairList, len(col.ViewsByPage))
+func (col *Collector) GetViews(obj map[string]int) (views string) {
+	p := make(PairList, len(obj))
 	i := 0
-	for k, v := range col.ViewsByPage {
+	for k, v := range obj {
 		p[i] = Pair{k, v}
 		i++
 	}
