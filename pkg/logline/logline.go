@@ -54,7 +54,7 @@ func (obj *SingleLogLine) New(logLine string) (err error) {
 
 func (obj *SingleLogLine) MatchAllRequirements(period string) bool {
 	request := regexp.MustCompile(`GET \/(\d{4}\/\d{2}\/\d{2}\/[^\/]+|tags\/[^\/]+|about|archives\/[^\/]+)\/ HTTP\/[12]\.[10]`)
-	http_user_agent := regexp.MustCompile(`.*([Bb]ot|vkShare|Google-AMPHTML|feedly|[cC]rawler|[Pp]arser|curl|-|Disqus).*`)
+	http_user_agent := regexp.MustCompile(`.*([Bb]ot|vkShare|Google-AMPHTML|feedly|[cC]rawler|[Pp]arser|curl|-|[Dd]isqus|[Dd]isqus|Daum).*`)
 	switch {
 	case obj.Status != "200":
 		return false
