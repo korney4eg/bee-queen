@@ -60,7 +60,12 @@ func main() {
 	// if o.FileName != "" {
 	// 	source.Close()
 	// }
-	msg := fmt.Sprintf("*%s*\n_Users: %d |  Hits: %d_\n*Popular pages*:\n```\n%+v\n```\n*Popular tags*:\n```\n%+v\n```\n*Top referers*:\n```\n%+v```", collection.Domain, collection.Users, collection.Hits, collection.GetViews(collection.PageViews), collection.GetViews(collection.TagViews), collection.GetViews(collection.Referers))
+	msg := fmt.Sprintf("*%s*\n_Users: %d |  Hits: %d_\n", collection.Domain, collection.Users, collection.Hits)
+	msg += fmt.Sprintf("*Popular pages*:\n```\n%+v\n", collection.GetViews(collection.PageViews))
+	msg += fmt.Sprintf("*Rags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
+	msg += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
+	msg += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
+	msg += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
 	if o.TelegramToken != "" && o.TelegramChatId != "" {
 		bot, err := tgbotapi.NewBotAPI(o.TelegramToken)
 		if err != nil {
