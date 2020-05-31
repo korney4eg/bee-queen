@@ -13,14 +13,22 @@ import (
 	logline "github.com/korney4eg/bee-queen/pkg/logline"
 )
 
-func SendReport(fileName, domainName, period, telegramToken, telegramChatId string) {
+type Command struct {
+	Period         string `short:"p" long:"period" required:"true" choice:"any" choice:"day" choice:"week" choice:"month"`
+	FileName       string `short:"f" long:"file" required:"false"`
+	TelegramToken  string `short:"t" long:"telegram-token" required:"false"`
+	TelegramChatId string `short:"c" long:"telegram-chat-id" required:"false"`
+	DomainName     string `short:"d" long:"domain" required:"true"`
+}
+
+func (c *Command) Execute(_ []string) error {
 	var err error
 	var source io.Reader
-	if fileName != "" {
-		source, err = os.Open(fileName)
+	if c.FileName != "" {
+		source, err = os.Open(c.FileName)
 
 		if err != nil {
-			log.Fatalf("failed opening file: %s", err)
+			return err
 		}
 
 	} else {
@@ -28,18 +36,18 @@ func SendReport(fileName, domainName, period, telegramToken, telegramChatId stri
 	}
 	scanner := bufio.NewScanner(source)
 	scanner.Split(bufio.ScanLines)
-	collection := &collector.Collector{Domain: domainName}
+	collection := &collector.Collector{Domain: c.DomainName}
 
 	for scanner.Scan() {
 		var sll logline.SingleLogLine
 		if err := sll.New(scanner.Text()); err != nil {
-			log.Fatalf("failed opening file: %s", err)
+			return err
 		}
-		if !sll.MatchAllRequirements(period) {
+		if !sll.MatchAllRequirements(c.Period) {
 			continue
 		}
 		if err := collection.Accumulate(&sll); err != nil {
-			log.Panic(err)
+			return err
 		}
 	}
 	// if o.FileName != "" {
@@ -51,16 +59,16 @@ func SendReport(fileName, domainName, period, telegramToken, telegramChatId stri
 	msg += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
 	msg += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
 	msg += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
-	if telegramToken != "" && telegramChatId != "" {
-		bot, err := tgbotapi.NewBotAPI(telegramToken)
+	if c.TelegramToken != "" && c.TelegramChatId != "" {
+		bot, err := tgbotapi.NewBotAPI(c.TelegramToken)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 
 		log.Printf("Authorized on account %s", bot.Self.UserName)
-		n, err := strconv.ParseInt(telegramChatId, 10, 64)
+		n, err := strconv.ParseInt(c.TelegramChatId, 10, 64)
 		if err == nil {
-			fmt.Printf("%d of type %T", n, n)
+			return err
 		}
 
 		message := tgbotapi.NewMessage(n, msg)
@@ -71,4 +79,5 @@ func SendReport(fileName, domainName, period, telegramToken, telegramChatId stri
 		fmt.Println(msg)
 
 	}
+	return nil
 }
