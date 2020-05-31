@@ -1,11 +1,14 @@
 package collector
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
+	"text/tabwriter"
 
 	logline "github.com/korney4eg/bee-queen/pkg/logline"
 	ua "github.com/mileusna/useragent"
@@ -21,6 +24,7 @@ type Collector struct {
 	ViewsByOS      map[string]int
 	TagViews       map[string]int
 	ArchiveViews   map[string]int
+	Referers       map[string]int
 }
 
 type PageViews struct {
@@ -57,12 +61,13 @@ func (col *Collector) Accumulate(line *logline.SingleLogLine) error {
 		return err
 	}
 	if strings.HasPrefix(decodedPage, "/tags/") {
-		col.TagViews[decodedPage] += 1
+		col.TagViews[strings.Split(decodedPage, "/")[2]] += 1
 	} else if strings.HasPrefix(decodedPage, "/archives/") {
-		col.ArchiveViews[decodedPage] += 1
+		col.ArchiveViews[strings.Split(decodedPage, "/")[2]] += 1
+	} else if decodedPage != "/about/" {
+		col.PageViews[strings.Split(decodedPage, "/")[4]] += 1
 	} else {
 		col.PageViews[decodedPage] += 1
-
 	}
 
 	ua := ua.Parse(line.HTTPUserAgent)
@@ -75,6 +80,17 @@ func (col *Collector) Accumulate(line *logline.SingleLogLine) error {
 		col.ViewsByOS = make(map[string]int)
 	}
 	col.ViewsByOS[ua.OS] += 1
+
+	if col.Referers == nil {
+		col.Referers = make(map[string]int)
+	}
+	ref := ""
+	if line.HTTPReferer == "-" {
+		ref = "-"
+	} else {
+		ref = strings.Split(line.HTTPReferer, "/")[2]
+	}
+	col.Referers[ref] += 1
 	return nil
 }
 
@@ -86,10 +102,14 @@ func (col *Collector) GetViews(obj map[string]int) (views string) {
 		i++
 	}
 	sort.Sort(sort.Reverse(p))
+
+	buf := new(bytes.Buffer)
+	w := tabwriter.NewWriter(buf, 0, 0, 3, ' ', tabwriter.TabIndent)
 	for _, k := range p {
-		views += fmt.Sprintf("%s:%d\n", k.Key, k.Value)
+		fmt.Fprintln(w, k.Key+"\t"+strconv.Itoa(k.Value))
 	}
-	return views
+	w.Flush()
+	return buf.String()
 }
 
 // A data structure to hold key/value pairs
