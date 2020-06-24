@@ -14,6 +14,10 @@ import (
 	ua "github.com/mileusna/useragent"
 )
 
+const (
+	maxLineLength = 45
+)
+
 type Collector struct {
 	Hits           int
 	Users          int
@@ -105,8 +109,14 @@ func (col *Collector) GetViews(obj map[string]int) (views string) {
 
 	buf := new(bytes.Buffer)
 	w := tabwriter.NewWriter(buf, 0, 0, 3, ' ', tabwriter.TabIndent)
+	tmpStr := ""
 	for _, k := range p {
-		fmt.Fprintln(w, k.Key+"\t"+strconv.Itoa(k.Value))
+		if len(k.Key) > maxLineLength {
+			tmpStr = k.Key[0:maxLineLength]
+		} else {
+			tmpStr = k.Key
+		}
+		fmt.Fprintln(w, tmpStr+"\t"+strconv.Itoa(k.Value))
 	}
 	w.Flush()
 	return buf.String()
