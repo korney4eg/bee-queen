@@ -7,10 +7,15 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	collector "github.com/korney4eg/bee-queen/pkg/collector"
 	logline "github.com/korney4eg/bee-queen/pkg/logline"
+)
+
+const (
+	MessageLimit = 4000
 )
 
 type Command struct {
@@ -53,30 +58,60 @@ func (c *Command) Execute(_ []string) error {
 	// if o.FileName != "" {
 	// 	source.Close()
 	// }
-	msg := fmt.Sprintf("*%s*\n_Users: %d |  Hits: %d_\n", collection.Domain, collection.Users, collection.Hits)
-	msg += fmt.Sprintf("*Popular pages*:\n```\n%+v\n", collection.GetViews(collection.PageViews))
-	msg += fmt.Sprintf("*Rags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
-	msg += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
-	msg += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
-	msg += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
+	messages := make([]string, 0)
+	msgLine := fmt.Sprintf("*%s*\n_Users: %d |  Hits: %d_\n", collection.Domain, collection.Users, collection.Hits)
+	msgLine += fmt.Sprintf("*Popular pages*:\n```\n%+v\n```\n", collection.GetViews(collection.PageViews))
+	msgLine += fmt.Sprintf("*Tags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
+	msgLine += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
+	msgLine += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
+	msgLine += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
+	curMsg := ""
+	properlyFinished := true
+	for _, msg := range strings.Split(msgLine, "\n") {
+		if len(curMsg+msg) > MessageLimit {
+			if !properlyFinished {
+				curMsg += "```\n"
+			}
+			messages = append(messages, curMsg)
+			if !properlyFinished {
+				curMsg = "```\n"
+			} else {
+				curMsg = ""
+			}
+
+		}
+		curMsg += msg + "\n"
+		if msg == "```" {
+			properlyFinished = !properlyFinished
+		}
+	}
+	messages = append(messages, curMsg)
+
 	if c.TelegramToken != "" && c.TelegramChatId != "" {
 		bot, err := tgbotapi.NewBotAPI(c.TelegramToken)
+		bot.Debug = true
 		if err != nil {
 			return err
 		}
 
 		log.Printf("Authorized on account %s", bot.Self.UserName)
 		n, err := strconv.ParseInt(c.TelegramChatId, 10, 64)
-		if err == nil {
-			return err
+		if err != nil {
+			log.Fatalf("Got error:%v\n", err)
 		}
 
-		message := tgbotapi.NewMessage(n, msg)
-		message.ParseMode = "markdown"
-		bot.Send(message)
+		for _, msg := range messages {
+			message := tgbotapi.NewMessage(n, msg)
+			message.ParseMode = "markdown"
+			bot.Send(message)
+			log.Println("Send message")
+		}
 
 	} else {
-		fmt.Println(msg)
+		for _, msg := range messages {
+			fmt.Println(msg)
+			fmt.Println("======================================================")
+		}
 
 	}
 	return nil
