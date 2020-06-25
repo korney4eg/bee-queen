@@ -53,6 +53,14 @@ func (obj *SingleLogLine) New(logLine string) (err error) {
 }
 
 func (obj *SingleLogLine) MatchAllRequirements(period string) bool {
+	switch {
+	case !obj.MatchAllWithoutPeriod() || !dateIsInInterval(obj.TimeLocal, period):
+		return false
+	default:
+		return true
+	}
+}
+func (obj *SingleLogLine) MatchAllWithoutPeriod() bool {
 	request := regexp.MustCompile(`GET \/(\d{4}\/\d{2}\/\d{2}\/[^\/]+|tags\/[^\/]+|about|archives\/[^\/]+)\/ HTTP\/[12]\.[10]`)
 	http_user_agent := regexp.MustCompile(`.*([Bb]ot|vkShare|Google-AMPHTML|feedly|[cC]rawler|[Pp]arser|curl|-|[Dd]isqus|[Dd]isqus|Daum).*`)
 	switch {
@@ -61,8 +69,6 @@ func (obj *SingleLogLine) MatchAllRequirements(period string) bool {
 	case !request.MatchString(obj.Request):
 		return false
 	case http_user_agent.MatchString(obj.HTTPUserAgent):
-		return false
-	case !dateIsInInterval(obj.TimeLocal, period):
 		return false
 	default:
 		return true

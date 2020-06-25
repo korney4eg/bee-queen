@@ -19,16 +19,16 @@ const (
 )
 
 type Collector struct {
-	Hits           int
-	Users          int
+	Hits           int `json:"hits"`
+	Users          int `json:"users"`
 	Domain         string
 	usersList      []string
-	PageViews      map[string]int
-	ViewsByBrowser map[string]int
-	ViewsByOS      map[string]int
-	TagViews       map[string]int
-	ArchiveViews   map[string]int
-	Referers       map[string]int
+	PageViews      map[string]int `json:"views_by_page"`
+	ViewsByBrowser map[string]int `json:"views_by_browser"`
+	ViewsByOS      map[string]int `json:"views_by_os"`
+	TagViews       map[string]int `json:"views_by_tag"`
+	ArchiveViews   map[string]int `json:"views_by_archive"`
+	Referers       map[string]int `json:"referers"`
 }
 
 type PageViews struct {
