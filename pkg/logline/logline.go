@@ -87,15 +87,34 @@ func ConvertMapToLogLine(parsedLine map[string]string) string {
 		http_user_agent)
 }
 
+func GetStartDate(period string, endTime time.Time) (startDate time.Time) {
+	switch period {
+	case "day":
+		return endTime.AddDate(0, 0, -1)
+	case "week":
+		return endTime.AddDate(0, 0, -7)
+	case "month":
+		return endTime.AddDate(0, -1, 0)
+	case "year":
+		return endTime.AddDate(-1, 0, 0)
+	default:
+		return time.Now()
+	}
+
+}
+
 func dateIsInInterval(line string, period string, endTime time.Time) bool {
 	var startDate time.Time
 	switch period {
 	case "week":
-		duration, _ := time.ParseDuration("168h")
-		startDate = endTime.Add(-duration)
+		startDate = GetStartDate(period, endTime)
 
 	case "month":
-		startDate = endTime.AddDate(0, -1, 0)
+		startDate = GetStartDate(period, endTime)
+	case "day":
+		startDate = GetStartDate(period, endTime)
+	case "year":
+		startDate = GetStartDate(period, endTime)
 	case "any":
 		return true
 	default:

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -20,11 +21,12 @@ const (
 )
 
 type Command struct {
-	Period         string `short:"p" long:"period" required:"true" choice:"any" choice:"day" choice:"week" choice:"month"`
+	Period         string `short:"p" long:"period" required:"true" choice:"any" choice:"day" choice:"week" choice:"month" choice:"year"`
 	FileName       string `short:"f" long:"file" required:"false"`
 	TelegramToken  string `short:"t" long:"telegram-token" required:"false"`
 	TelegramChatId string `short:"c" long:"telegram-chat-id" required:"false"`
 	DomainName     string `short:"d" long:"domain" required:"true"`
+	EndDate        string `short:"e" long:"end-date" required:"false"`
 }
 
 func (c *Command) Execute(_ []string) error {
@@ -42,25 +44,40 @@ func (c *Command) Execute(_ []string) error {
 	}
 	scanner := bufio.NewScanner(source)
 	scanner.Split(bufio.ScanLines)
-	collection := &collector.Collector{Domain: c.DomainName}
+	var endTime time.Time
+	if c.EndDate != "" {
+		res1, _ := regexp.MatchString("^[0-9][0-9].[0-9][0-9].20[0-9][0-9]$", c.EndDate)
+		if !res1 {
+			log.Fatalf("Wrong date format '%s'. Example '01.02.2020'", c.EndDate)
+		}
+		endTime, _ = time.Parse("02.01.2006", c.EndDate)
+	} else {
+		endTime = time.Now()
+	}
+	log.Println(endTime)
 
+	collection := &collector.Collector{Domain: c.DomainName}
+	oldCollection := &collector.Collector{Domain: c.DomainName}
 	for scanner.Scan() {
 		var sll logline.SingleLogLine
 		if err := sll.New(scanner.Text()); err != nil {
 			return err
 		}
-		if !sll.MatchAllRequirements(c.Period, time.Now()) {
-			continue
-		}
-		if err := collection.Accumulate(&sll); err != nil {
-			return err
+		if sll.MatchAllRequirements(c.Period, endTime) {
+			if err := collection.Accumulate(&sll); err != nil {
+				return err
+			}
+		} else if sll.MatchAllRequirements(c.Period, logline.GetStartDate(c.Period, endTime)) {
+			if err := oldCollection.Accumulate(&sll); err != nil {
+				return err
+			}
 		}
 	}
 	// if o.FileName != "" {
 	// 	source.Close()
 	// }
 	messages := make([]string, 0)
-	msgLine := fmt.Sprintf("*%s*\n_Users: %d |  Hits: %d_\n", collection.Domain, collection.Users, collection.Hits)
+	msgLine := fmt.Sprintf("*%s*\n_Users: %d(%d) |  Hits: %d(%d)_\n", collection.Domain, collection.Users, collection.Users-oldCollection.Users, collection.Hits, collection.Hits-oldCollection.Hits)
 	msgLine += fmt.Sprintf("*Popular pages*:\n```\n%+v\n```\n", collection.GetViews(collection.PageViews))
 	msgLine += fmt.Sprintf("*Tags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
 	msgLine += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
