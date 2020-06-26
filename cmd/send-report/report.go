@@ -88,10 +88,10 @@ func (c *Command) Execute(_ []string) error {
 	messages := make([]string, 0)
 	msgLine := fmt.Sprintf("*%s*\n_Users: %d(%s) |  Hits: %d(%s)_\n", collection.Domain, collection.Users, printDiff(collection.Users, oldCollection.Users), collection.Hits, printDiff(collection.Hits, oldCollection.Hits))
 	msgLine += fmt.Sprintf("*Popular pages*:\n```\n%+v\n```\n", collection.GetViews(collection.PageViews))
-	// msgLine += fmt.Sprintf("*Tags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
-	// msgLine += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
-	// msgLine += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
-	// msgLine += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
+	msgLine += fmt.Sprintf("*Tags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
+	msgLine += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
+	msgLine += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
+	msgLine += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
 	curMsg := ""
 	properlyFinished := true
 	for _, msg := range strings.Split(msgLine, "\n") {
