@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	logline "github.com/korney4eg/bee-queen/pkg/logline"
 )
@@ -35,7 +36,7 @@ func (c *Command) Execute(_ []string) error {
 		if err := sll.New(scanner.Text()); err != nil {
 			return err
 		}
-		if !sll.MatchAllRequirements(c.Period) {
+		if !sll.MatchAllRequirements(c.Period, time.Now()) {
 			continue
 		}
 		fmt.Println(scanner.Text())

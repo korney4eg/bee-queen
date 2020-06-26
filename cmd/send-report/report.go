@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	collector "github.com/korney4eg/bee-queen/pkg/collector"
@@ -48,7 +49,7 @@ func (c *Command) Execute(_ []string) error {
 		if err := sll.New(scanner.Text()); err != nil {
 			return err
 		}
-		if !sll.MatchAllRequirements(c.Period) {
+		if !sll.MatchAllRequirements(c.Period, time.Now()) {
 			continue
 		}
 		if err := collection.Accumulate(&sll); err != nil {

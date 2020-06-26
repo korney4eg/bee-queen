@@ -52,9 +52,9 @@ func (obj *SingleLogLine) New(logLine string) (err error) {
 	return nil
 }
 
-func (obj *SingleLogLine) MatchAllRequirements(period string) bool {
+func (obj *SingleLogLine) MatchAllRequirements(period string, endTime time.Time) bool {
 	switch {
-	case !obj.MatchAllWithoutPeriod() || !dateIsInInterval(obj.TimeLocal, period):
+	case !obj.MatchAllWithoutPeriod() || !dateIsInInterval(obj.TimeLocal, period, endTime):
 		return false
 	default:
 		return true
@@ -87,16 +87,15 @@ func ConvertMapToLogLine(parsedLine map[string]string) string {
 		http_user_agent)
 }
 
-func dateIsInInterval(line string, period string) bool {
-	now := time.Now()
+func dateIsInInterval(line string, period string, endTime time.Time) bool {
 	var startDate time.Time
 	switch period {
 	case "week":
 		duration, _ := time.ParseDuration("168h")
-		startDate = now.Add(-duration)
+		startDate = endTime.Add(-duration)
 
 	case "month":
-		startDate = now.AddDate(0, -1, 0)
+		startDate = endTime.AddDate(0, -1, 0)
 	case "any":
 		return true
 	default:

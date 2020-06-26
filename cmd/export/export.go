@@ -87,7 +87,7 @@ func (c *Command) Execute(_ []string) error {
 			stats[date] = *collection
 
 		}
-		file, err := json.MarshalIndent(*collection, "", " ")
+		file, err := json.Marshal(*collection)
 		if err != nil {
 			log.Fatal(err)
 		}
