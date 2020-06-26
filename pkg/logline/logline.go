@@ -121,5 +121,8 @@ func dateIsInInterval(line string, period string, endTime time.Time) bool {
 		return false
 	}
 	t, _ := time.Parse("02/Jan/2006:15:04:05 -0700", line)
-	return startDate.Before(t)
+	// if endTime.After(t) && startDate.Before(t) {
+	// 	log.Printf("| %v === %s === %v", endTime, line, startDate)
+	// }
+	return endTime.After(t) && startDate.Before(t)
 }

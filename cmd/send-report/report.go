@@ -29,6 +29,14 @@ type Command struct {
 	EndDate        string `short:"e" long:"end-date" required:"false"`
 }
 
+func printDiff(a, b int) string {
+	if a > b {
+		return "+" + strconv.Itoa(a-b)
+	} else {
+		return strconv.Itoa(a - b)
+	}
+}
+
 func (c *Command) Execute(_ []string) error {
 	var err error
 	var source io.Reader
@@ -55,6 +63,7 @@ func (c *Command) Execute(_ []string) error {
 		endTime = time.Now()
 	}
 	log.Println(endTime)
+	log.Println(logline.GetStartDate(c.Period, endTime))
 
 	collection := &collector.Collector{Domain: c.DomainName}
 	oldCollection := &collector.Collector{Domain: c.DomainName}
@@ -77,12 +86,12 @@ func (c *Command) Execute(_ []string) error {
 	// 	source.Close()
 	// }
 	messages := make([]string, 0)
-	msgLine := fmt.Sprintf("*%s*\n_Users: %d(%d) |  Hits: %d(%d)_\n", collection.Domain, collection.Users, collection.Users-oldCollection.Users, collection.Hits, collection.Hits-oldCollection.Hits)
+	msgLine := fmt.Sprintf("*%s*\n_Users: %d(%s) |  Hits: %d(%s)_\n", collection.Domain, collection.Users, printDiff(collection.Users, oldCollection.Users), collection.Hits, printDiff(collection.Hits, oldCollection.Hits))
 	msgLine += fmt.Sprintf("*Popular pages*:\n```\n%+v\n```\n", collection.GetViews(collection.PageViews))
-	msgLine += fmt.Sprintf("*Tags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
-	msgLine += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
-	msgLine += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
-	msgLine += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
+	// msgLine += fmt.Sprintf("*Tags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
+	// msgLine += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
+	// msgLine += fmt.Sprintf("*Browsers*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByBrowser))
+	// msgLine += fmt.Sprintf("*OS*:\n```\n%+v```\n", collection.GetViews(collection.ViewsByOS))
 	curMsg := ""
 	properlyFinished := true
 	for _, msg := range strings.Split(msgLine, "\n") {
