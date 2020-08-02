@@ -22,7 +22,7 @@ type Collector struct {
 	Hits           int `json:"hits"`
 	Users          int `json:"users"`
 	Domain         string
-	usersList      []string
+	UsersList      []string       `json:"users_list"`
 	PageViews      map[string]int `json:"views_by_page"`
 	ViewsByBrowser map[string]int `json:"views_by_browser"`
 	ViewsByOS      map[string]int `json:"views_by_os"`
@@ -40,14 +40,14 @@ func (col *Collector) Accumulate(line *logline.SingleLogLine) error {
 	col.Hits++
 	uniqUserName := fmt.Sprintf("%x", sha256.Sum256([]byte(line.RemoteAddr+line.HTTPUserAgent)))
 	userIn := false
-	for _, user := range col.usersList {
+	for _, user := range col.UsersList {
 		if user == uniqUserName {
 			userIn = true
 			break
 		}
 	}
 	if !userIn {
-		col.usersList = append(col.usersList, uniqUserName)
+		col.UsersList = append(col.UsersList, uniqUserName)
 		col.Users++
 	}
 	page := strings.Split(line.Request, " ")[1]
