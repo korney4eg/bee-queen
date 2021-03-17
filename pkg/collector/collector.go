@@ -98,6 +98,13 @@ func (col *Collector) Accumulate(line *logline.SingleLogLine) error {
 	return nil
 }
 
+func (col *Collector) GetTotalViews(obj map[string]int) (views int) {
+	for k, v := range obj {
+		views += v
+	}
+	return views
+}
+
 func (col *Collector) GetViews(obj map[string]int) (views string) {
 	p := make(PairList, len(obj))
 	i := 0

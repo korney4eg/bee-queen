@@ -86,7 +86,7 @@ func (c *Command) Execute(_ []string) error {
 	// 	source.Close()
 	// }
 	messages := make([]string, 0)
-	msgLine := fmt.Sprintf("*%s*\n_Users: %d(%s) |  Hits: %d(%s)_\n", collection.Domain, collection.Users, printDiff(collection.Users, oldCollection.Users), collection.Hits, printDiff(collection.Hits, oldCollection.Hits))
+	msgLine := fmt.Sprintf("*%s*\n_Users: %d(%s) |  Pages Total: %d(%s)|  Hits: %d(%s)_\n", collection.Domain, collection.Users, printDiff(collection.Users, oldCollection.Users), collection.GetTotalViews(collection.PageViews), printDiff(collection.GetTotalViews(collection.PageViews), oldCollection.GetTotalViews(oldCollection.PageViews)), collection.Hits, printDiff(collection.Hits, oldCollection.Hits))
 	msgLine += fmt.Sprintf("*Popular pages*:\n```\n%+v\n```\n", collection.GetViews(collection.PageViews))
 	msgLine += fmt.Sprintf("*Tags*:\n```\n%+v\n```\n", collection.GetViews(collection.TagViews))
 	msgLine += fmt.Sprintf("*Referers*:\n```\n%+v```\n", collection.GetViews(collection.Referers))
