@@ -99,7 +99,7 @@ func (col *Collector) Accumulate(line *logline.SingleLogLine) error {
 }
 
 func (col *Collector) GetTotalViews(obj map[string]int) (views int) {
-	for k, v := range obj {
+	for _, v := range obj {
 		views += v
 	}
 	return views
